@@ -15,6 +15,7 @@ The goal of this project is to build a small backend application step by step an
 
 - JSON API
 - CRUD operations for notes
+- Basic HTML interface
 - Basic request validation
 - Routes, services and repositories layers
 
@@ -29,6 +30,10 @@ The goal of this project is to build a small backend application step by step an
 | PUT | `/notes/<id>` | Update note |
 | DELETE | `/notes/<id>` | Delete note |
 
+## Web Interface
+
+`/notes-page` provides a basic HTML interface for viewing, creating, updating and deleting notes.
+
 ## Note Example
 
 ```json
@@ -38,7 +43,3 @@ The goal of this project is to build a small backend application step by step an
   "category": "Learning"
 }
 ```
-
-## Status
-
-Initial version: basic CRUD API with Flask, SQLite and raw SQL.
