@@ -1,6 +1,6 @@
 import sqlite3
-
 from pathlib import Path
+
 from config import DATABASE_NAME
 
 BASE_DIR = Path(__file__).resolve().parent

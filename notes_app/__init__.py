@@ -1,4 +1,5 @@
 from flask import Flask
+
 from notes_app.routes.api import api_bp
 from notes_app.routes.web import web_bp
 
