@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notes API</title>
+  </head>
+  <body>
+    <h1>Notes API</h1>
+    <hr />
+    {% if error %}
+    <p style="color: red">{{ error }}</p>
+    <hr />
+    {% endif %}
+    <h2>Create Note</h2>
+    <form action="/notes-page" method="POST">
+      <p>
+        <label for="title">Title: </label>
+        <input
+          type="text"
+          name="title"
+          id="title"
+          placeholder="Title"
+          required
+        />
+        <label for="content">Content: </label>
+        <input
+          type="text"
+          name="content"
+          id="content"
+          placeholder="Content"
+          required
+        />
+        <label for="category">Category: </label>
+        <input
+          type="text"
+          name="category"
+          id="category"
+          placeholder="Category"
+          required
+        />
+        <button type="submit">Create</button>
+      </p>
+    </form>
+    <hr />
+    <table border="1" cellpadding="10" cellspacing="0">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Content</th>
+          <th>Category</th>
+          <th>Created at</th>
+          <th>Update</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for note in notes %}
+        <tr>
+          <td>{{ note.title }}</td>
+          <td>{{ note.content }}</td>
+          <td>{{ note.category }}</td>
+          <td>{{ note.created_at }}</td>
+          <td>
+            <form action="/notes-page/update/{{ note.id }}" method="POST">
+              <input
+                type="text"
+                name="title"
+                placeholder="New title"
+                value="{{ note.title }}"
+                required
+              />
+              <input
+                type="text"
+                name="content"
+                placeholder="New content"
+                value="{{ note.content }}"
+                required
+              />
+              <input
+                type="text"
+                name="category"
+                placeholder="New category"
+                value="{{ note.category }}"
+                required
+              />
+              <button type="submit">Update</button>
+            </form>
+          </td>
+          <td>
+            <form action="/notes-page/delete/{{ note.id }}" method="POST">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
