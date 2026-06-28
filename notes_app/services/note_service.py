@@ -15,14 +15,14 @@ def validate_note_data(data):
     content = data.get("content")
     category = data.get("category")
 
-    if not isinstance(title, str) or title.strip() == "":
-        return None, "Title is required"
+    if title is None or not isinstance(title, str) or title.strip() == "":
+        return None, "Invalid title"
 
-    if not isinstance(content, str) or content.strip() == "":
-        return None, "Content is required"
+    if content is None or not isinstance(content, str) or content.strip() == "":
+        return None, "Invalid content"
 
-    if not isinstance(category, str) or category.strip() == "":
-        return None, "Category is required"
+    if category is None or not isinstance(category, str) or category.strip() == "":
+        return None, "Invalid category"
 
     clean_data = {
         "title": title.strip(),
