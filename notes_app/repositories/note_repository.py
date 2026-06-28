@@ -31,7 +31,7 @@ def rows_to_notes(rows):
     return notes
 
 
-def get_notes_db(category_filter, created_date_filter):
+def get_notes_db(category_filter, created_date_filter, search):
     query = "SELECT * FROM notes"
     conditions = []
     values = []
@@ -43,6 +43,11 @@ def get_notes_db(category_filter, created_date_filter):
     if created_date_filter:
         conditions.append("created_at LIKE ?")
         values.append(created_date_filter + "%")
+
+    if search:
+        conditions.append("(title LIKE ? OR content LIKE ?)")
+        values.append(f"%{search}%")
+        values.append(f"%{search}%")
 
     if conditions:
         query += " WHERE " + " AND ".join(conditions)

@@ -15,8 +15,12 @@ def get_notes_page():
     category_filter = request.args.get("category")
     created_date_filter = request.args.get("created_date")
 
+    search = request.args.get("search")
+
     notes, error = get_notes_service(
-        category_filter=category_filter, created_date_filter=created_date_filter
+        category_filter=category_filter,
+        created_date_filter=created_date_filter,
+        search=search,
     )
 
     if error is not None:
