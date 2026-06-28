@@ -31,11 +31,28 @@ def rows_to_notes(rows):
     return notes
 
 
-def get_all_notes_db():
+def get_notes_db(category_filter, created_date_filter):
+    query = "SELECT * FROM notes"
+    conditions = []
+    values = []
+
+    if category_filter:
+        conditions.append("category = ?")
+        values.append(category_filter)
+
+    if created_date_filter:
+        conditions.append("created_at LIKE ?")
+        values.append(created_date_filter + "%")
+
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    query += " ORDER BY id"
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM notes ORDER BY id")
+    cursor.execute(query, tuple(values))
 
     rows = cursor.fetchall()
 

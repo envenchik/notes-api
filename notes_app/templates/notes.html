@@ -43,6 +43,26 @@
       </p>
     </form>
     <hr />
+    <h2>Filters</h2>
+    <form action="/notes-page" method="GET">
+      <label for="category_filter">Category: </label>
+      <input
+        type="text"
+        name="category"
+        id="category_filter"
+        placeholder="Enter category"
+      />
+      <label for="created_date_filter">Created date: </label>
+      <input
+        type="text"
+        name="created_date"
+        id="created_date_filter"
+        placeholder="Enter date like 2000-01-01"
+      />
+      <button type="submit">Apply filter</button>
+      <a href="/notes-page">All notes</a>
+    </form>
+    <hr />
     <table border="1" cellpadding="10" cellspacing="0">
       <thead>
         <tr>
