@@ -43,7 +43,7 @@
       </p>
     </form>
     <hr />
-    <h2>Filters</h2>
+    <h2>Filters and Search</h2>
     <form action="/notes-page" method="GET">
       <label for="category_filter">Category: </label>
       <input
@@ -59,7 +59,14 @@
         id="created_date_filter"
         placeholder="Enter date like 2000-01-01"
       />
-      <button type="submit">Apply filter</button>
+      <label for="search">Search text: </label>
+      <input
+        type="text"
+        name="search"
+        id="search"
+        placeholder="Enter what you want to find"
+      />
+      <button type="submit">Apply</button>
       <a href="/notes-page">All notes</a>
     </form>
     <hr />

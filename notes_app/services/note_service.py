@@ -47,13 +47,26 @@ def clean_note_filters(category_filter, created_date_filter):
     return category_filter, created_date_filter
 
 
-def get_notes_service(category_filter=None, created_date_filter=None):
+def clean_search(search):
+    if search is None or search.strip() == "":
+        search = None
+    else:
+        search = search.strip()
+
+    return search
+
+
+def get_notes_service(category_filter=None, created_date_filter=None, search=None):
     category_filter, created_date_filter = clean_note_filters(
         category_filter, created_date_filter
     )
 
+    search = clean_search(search)
+
     notes = get_notes_db(
-        category_filter=category_filter, created_date_filter=created_date_filter
+        category_filter=category_filter,
+        created_date_filter=created_date_filter,
+        search=search,
     )
 
     return notes, None
