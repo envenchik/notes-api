@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from notes_app.services.note_service import (
-    get_all_notes_service,
+    get_notes_service,
     get_note_by_id_service,
     create_note_service,
     update_note_service,
@@ -17,8 +17,13 @@ def index():
 
 
 @api_bp.route("/notes", methods=["GET"])
-def get_all_notes():
-    notes, error = get_all_notes_service()
+def get_notes():
+    category_filter = request.args.get("category")
+    created_date_filter = request.args.get("created_date")
+
+    notes, error = get_notes_service(
+        category_filter=category_filter, created_date_filter=created_date_filter
+    )
 
     if error is not None:
         return jsonify({"error": error}), 400

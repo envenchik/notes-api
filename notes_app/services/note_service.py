@@ -1,5 +1,5 @@
 from notes_app.repositories.note_repository import (
-    get_all_notes_db,
+    get_notes_db,
     get_note_by_id_db,
     create_note_db,
     update_note_db,
@@ -33,8 +33,28 @@ def validate_note_data(data):
     return clean_data, None
 
 
-def get_all_notes_service():
-    notes = get_all_notes_db()
+def clean_note_filters(category_filter, created_date_filter):
+    if category_filter is None or category_filter.strip() == "":
+        category_filter = None
+    else:
+        category_filter = category_filter.strip()
+
+    if created_date_filter is None or created_date_filter.strip() == "":
+        created_date_filter = None
+    else:
+        created_date_filter = created_date_filter.strip()
+
+    return category_filter, created_date_filter
+
+
+def get_notes_service(category_filter=None, created_date_filter=None):
+    category_filter, created_date_filter = clean_note_filters(
+        category_filter, created_date_filter
+    )
+
+    notes = get_notes_db(
+        category_filter=category_filter, created_date_filter=created_date_filter
+    )
 
     return notes, None
 
