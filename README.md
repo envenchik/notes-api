@@ -33,7 +33,7 @@ The goal of this project is to build a small backend application step by step an
 
 ## Filters
 
-Notes can be filtered by category and created date:
+Notes can be filtered by category and created date.
 
 ## Web Interface
 
