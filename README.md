@@ -16,6 +16,7 @@ The goal of this project is to build a small backend application step by step an
 - JSON API
 - CRUD operations for notes
 - Filtering notes by category and created date
+- Searching notes by title and content
 - Basic HTML interface
 - Basic request validation
 - Routes, services and repositories layers
@@ -35,9 +36,11 @@ The goal of this project is to build a small backend application step by step an
 
 Notes can be filtered by category and created date.
 
+Notes can also be searched by title or content.
+
 ## Web Interface
 
-`/notes-page` provides a basic HTML interface for viewing, creating, updating, deleting and filtering notes.
+`/notes-page` provides a basic HTML interface for viewing, creating, updating, deleting, filtering and searching notes.
 
 ## Note Example
 
