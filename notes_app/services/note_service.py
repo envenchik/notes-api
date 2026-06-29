@@ -6,6 +6,12 @@ from notes_app.repositories.note_repository import (
     delete_note_db,
 )
 
+ALLOWED_SORT_FIELDS = ["id", "title", "created_at"]
+ALLOWED_ORDERS = ["asc", "desc"]
+
+DEFAULT_SORT = "created_at"
+DEFAULT_ORDER = "desc"
+
 
 def validate_note_data(data):
     if not isinstance(data, dict):
@@ -56,17 +62,43 @@ def clean_search(search):
     return search
 
 
-def get_notes_service(category_filter=None, created_date_filter=None, search=None):
+def clean_sorting(sort, order):
+    if sort is not None:
+        sort = sort.strip().lower()
+
+    if order is not None:
+        order = order.strip().lower()
+
+    if sort not in ALLOWED_SORT_FIELDS:
+        sort = DEFAULT_SORT
+
+    if order not in ALLOWED_ORDERS:
+        order = DEFAULT_ORDER
+
+    return sort, order
+
+
+def get_notes_service(
+    category_filter=None,
+    created_date_filter=None,
+    search=None,
+    sort=None,
+    order=None,
+):
     category_filter, created_date_filter = clean_note_filters(
         category_filter, created_date_filter
     )
 
     search = clean_search(search)
 
+    sort, order = clean_sorting(sort, order)
+
     notes = get_notes_db(
         category_filter=category_filter,
         created_date_filter=created_date_filter,
         search=search,
+        sort=sort,
+        order=order,
     )
 
     return notes, None
