@@ -17,6 +17,7 @@ The goal of this project is to build a small backend application step by step an
 - CRUD operations for notes
 - Filtering notes by category and created date
 - Searching notes by title and content
+- Sorting notes by ID, title and creation date
 - Basic HTML interface
 - Basic request validation
 - Routes, services and repositories layers
@@ -26,21 +27,23 @@ The goal of this project is to build a small backend application step by step an
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | GET | `/` | Health check |
-| GET | `/notes` | Get notes with optional filters |
+| GET | `/notes` | Get notes with optional filtering, search and sorting |
 | GET | `/notes/<id>` | Get note by ID |
 | POST | `/notes` | Create note |
 | PUT | `/notes/<id>` | Update note |
 | DELETE | `/notes/<id>` | Delete note |
 
-## Filters
+## Query Options
 
 Notes can be filtered by category and created date.
 
-Notes can also be searched by title or content.
+Notes can be searched by title and content.
+
+Notes can be sorted by ID, title and creation date.
 
 ## Web Interface
 
-`/notes-page` provides a basic HTML interface for viewing, creating, updating, deleting, filtering and searching notes.
+`/notes-page` provides a basic HTML interface for viewing, creating, updating, deleting, filtering, searching and sorting notes.
 
 ## Note Example
 
