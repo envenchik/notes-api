@@ -31,7 +31,7 @@ def rows_to_notes(rows):
     return notes
 
 
-def get_notes_db(category_filter, created_date_filter, search):
+def get_notes_db(category_filter, created_date_filter, search, sort, order):
     query = "SELECT * FROM notes"
     conditions = []
     values = []
@@ -52,7 +52,7 @@ def get_notes_db(category_filter, created_date_filter, search):
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
-    query += " ORDER BY id"
+    query += f" ORDER BY {sort} {order.upper()}"
 
     connection = get_db_connection()
     cursor = connection.cursor()

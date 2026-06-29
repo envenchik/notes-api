@@ -43,7 +43,7 @@
       </p>
     </form>
     <hr />
-    <h2>Filters and Search</h2>
+    <h2>Filters</h2>
     <form action="/notes-page" method="GET">
       <label for="category_filter">Category: </label>
       <input
@@ -66,6 +66,17 @@
         id="search"
         placeholder="Enter what you want to find"
       />
+      <label for="sort">Sort by: </label>
+      <select name="sort" id="sort">
+        <option value="id">Id</option>
+        <option value="title">Title</option>
+        <option value="created_at" selected>Created at</option>
+      </select>
+      <label for="order">Order: </label>
+      <select name="order" id="order">
+        <option value="asc">Asc</option>
+        <option value="desc" selected>Desc</option>
+      </select>
       <button type="submit">Apply</button>
       <a href="/notes-page">All notes</a>
     </form>
@@ -73,6 +84,7 @@
     <table border="1" cellpadding="10" cellspacing="0">
       <thead>
         <tr>
+          <th>Id</th>
           <th>Title</th>
           <th>Content</th>
           <th>Category</th>
@@ -84,6 +96,7 @@
       <tbody>
         {% for note in notes %}
         <tr>
+          <td>{{ note.id }}</td>
           <td>{{ note.title }}</td>
           <td>{{ note.content }}</td>
           <td>{{ note.category }}</td>

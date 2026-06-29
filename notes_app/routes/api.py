@@ -20,13 +20,16 @@ def index():
 def get_notes():
     category_filter = request.args.get("category")
     created_date_filter = request.args.get("created_date")
-
     search = request.args.get("search")
+    sort = request.args.get("sort")
+    order = request.args.get("order")
 
     notes, error = get_notes_service(
         category_filter=category_filter,
         created_date_filter=created_date_filter,
         search=search,
+        sort=sort,
+        order=order,
     )
 
     if error is not None:
