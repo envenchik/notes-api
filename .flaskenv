@@ -1,0 +1,2 @@
+FLASK_APP=notes_app
+FLASK_DEBUG=1
