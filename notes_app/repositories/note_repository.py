@@ -1,13 +1,4 @@
-import sqlite3
-
-from config import DATABASE_NAME
-
-
-def get_db_connection():
-    connection = sqlite3.connect(DATABASE_NAME)
-    connection.row_factory = sqlite3.Row
-
-    return connection
+from notes_app.db import get_db
 
 
 def row_to_note(row):
@@ -54,14 +45,12 @@ def get_notes_db(category_filter, created_date_filter, search, sort, order):
 
     query += f" ORDER BY {sort} {order.upper()}"
 
-    connection = get_db_connection()
+    connection = get_db()
     cursor = connection.cursor()
 
     cursor.execute(query, tuple(values))
 
     rows = cursor.fetchall()
-
-    connection.close()
 
     notes = rows_to_notes(rows)
 
@@ -69,14 +58,12 @@ def get_notes_db(category_filter, created_date_filter, search, sort, order):
 
 
 def get_note_by_id_db(note_id):
-    connection = get_db_connection()
+    connection = get_db()
     cursor = connection.cursor()
 
     cursor.execute("SELECT * FROM notes WHERE id = ?", (note_id,))
 
     row = cursor.fetchone()
-
-    connection.close()
 
     note = row_to_note(row)
 
@@ -84,7 +71,7 @@ def get_note_by_id_db(note_id):
 
 
 def create_note_db(title, content, category):
-    connection = get_db_connection()
+    connection = get_db()
     cursor = connection.cursor()
 
     cursor.execute(
@@ -95,7 +82,6 @@ def create_note_db(title, content, category):
     new_note_id = cursor.lastrowid
 
     connection.commit()
-    connection.close()
 
     new_note = get_note_by_id_db(new_note_id)
 
@@ -103,7 +89,7 @@ def create_note_db(title, content, category):
 
 
 def update_note_db(note_id, title, content, category):
-    connection = get_db_connection()
+    connection = get_db()
     cursor = connection.cursor()
 
     cursor.execute(
@@ -112,11 +98,9 @@ def update_note_db(note_id, title, content, category):
     )
 
     if cursor.rowcount == 0:
-        connection.close()
         return None
 
     connection.commit()
-    connection.close()
 
     updated_note = get_note_by_id_db(note_id)
 
@@ -124,16 +108,14 @@ def update_note_db(note_id, title, content, category):
 
 
 def delete_note_db(note_id):
-    connection = get_db_connection()
+    connection = get_db()
     cursor = connection.cursor()
 
     cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
 
     if cursor.rowcount == 0:
-        connection.close()
         return False
 
     connection.commit()
-    connection.close()
 
     return True
