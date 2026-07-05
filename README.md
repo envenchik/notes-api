@@ -26,20 +26,24 @@ The goal of this project is to build a small backend application step by step an
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| GET | `/` | Health check |
-| GET | `/notes` | Get notes with optional filtering, search and sorting |
-| GET | `/notes/<id>` | Get note by ID |
-| POST | `/notes` | Create note |
-| PUT | `/notes/<id>` | Update note |
-| DELETE | `/notes/<id>` | Delete note |
+| GET | `/api/` | Health check |
+| GET | `/api/notes` | Get notes with optional filtering, search and sorting |
+| GET | `/api/notes/<id>` | Get note by ID |
+| POST | `/api/notes` | Create note |
+| PUT | `/api/notes/<id>` | Update note |
+| DELETE | `/api/notes/<id>` | Delete note |
 
 ## Query Options
 
-Notes can be filtered by category and created date.
+`GET /api/notes` supports these optional query parameters:
 
-Notes can be searched by title and content.
-
-Notes can be sorted by ID, title and creation date.
+| Parameter | Example | Description |
+| --- | --- | --- |
+| `category` | `/api/notes?category=Learning` | Filter by category |
+| `created_date` | `/api/notes?created_date=2000-01-01` | Filter by creation date prefix |
+| `search` | `/api/notes?search=Example` | Search in title and content |
+| `sort` | `/api/notes?sort=title` | Sort by `id`, `title`, or `created_at` |
+| `order` | `/api/notes?order=asc` | Sort order: `asc` or `desc` |
 
 ## Web Interface
 
