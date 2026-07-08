@@ -45,6 +45,20 @@ The goal of this project is to build a small backend application step by step an
 | `sort` | `/api/notes?sort=title` | Sort by `id`, `title`, or `created_at` |
 | `order` | `/api/notes?order=asc` | Sort order: `asc` or `desc` |
 
+## Errors
+
+API errors use this format:
+
+```json
+{
+  "error": {
+    "code": "invalid_title",
+    "message": "Title must be a non-empty string"
+  }
+}
+```
+Invalid input returns `400`. Missing resources return `404`. Unsupported methods return `405`.
+
 ## Web Interface
 
 `/notes-page` provides a basic HTML interface for viewing, creating, updating, deleting, filtering, searching and sorting notes.
