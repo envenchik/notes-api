@@ -8,6 +8,11 @@ from notes_app.services.note_service import (
     delete_note_service,
 )
 
+
+def error_json(error, status_code):
+    return jsonify({"error": error}), status_code
+
+
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
 
@@ -18,22 +23,12 @@ def index():
 
 @api_bp.route("/notes", methods=["GET"])
 def get_notes():
-    category_filter = request.args.get("category")
-    created_date_filter = request.args.get("created_date")
-    search = request.args.get("search")
-    sort = request.args.get("sort")
-    order = request.args.get("order")
+    query_params = request.args.to_dict()
 
-    notes, error = get_notes_service(
-        category_filter=category_filter,
-        created_date_filter=created_date_filter,
-        search=search,
-        sort=sort,
-        order=order,
-    )
+    notes, error = get_notes_service(query_params)
 
     if error is not None:
-        return jsonify({"error": error}), 400
+        return error_json(error, 400)
 
     return jsonify(notes), 200
 
@@ -43,7 +38,7 @@ def get_note_by_id(note_id):
     note, error = get_note_by_id_service(note_id)
 
     if error is not None:
-        return jsonify({"error": error}), 404
+        return error_json(error, 404)
 
     return jsonify(note), 200
 
@@ -55,7 +50,7 @@ def create_note():
     new_note, error = create_note_service(data)
 
     if error is not None:
-        return jsonify({"error": error}), 400
+        return error_json(error, 400)
 
     return jsonify(new_note), 201
 
@@ -66,11 +61,11 @@ def update_note(note_id):
 
     updated_note, error = update_note_service(note_id, data)
 
-    if error == "Note not found":
-        return jsonify({"error": error}), 404
+    if error is not None and error["code"] == "note_not_found":
+        return error_json(error, 404)
 
     if error is not None:
-        return jsonify({"error": error}), 400
+        return error_json(error, 400)
 
     return jsonify(updated_note), 200
 
@@ -80,6 +75,6 @@ def delete_note(note_id):
     _, error = delete_note_service(note_id)
 
     if error is not None:
-        return jsonify({"error": error}), 404
+        return error_json(error, 404)
 
     return "", 204

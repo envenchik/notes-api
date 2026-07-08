@@ -1,5 +1,6 @@
 from pathlib import Path
-from flask import Flask
+from flask import Flask, jsonify, request
+from werkzeug.exceptions import HTTPException
 from . import db
 from notes_app.routes.api import api_bp
 from notes_app.routes.web import web_bp
@@ -24,4 +25,22 @@ def create_app(test_config=None) -> Flask:
     app.register_blueprint(api_bp)
     app.register_blueprint(web_bp)
 
+    register_error_handlers(app)
+
     return app
+
+
+def register_error_handlers(app):
+    @app.errorhandler(HTTPException)
+    def handle_http_exception(http_error):
+        if request.path.startswith("/api/"):
+            response = {
+                "error": {
+                    "code": http_error.name.lower().replace(" ", "_"),
+                    "message": http_error.description,
+                }
+            }
+
+            return jsonify(response), http_error.code
+
+        return http_error
