@@ -21,6 +21,20 @@ def test_init_db_command(runner):
     assert "Initialized the database." in result.output
 
 
+def test_invalid_url(client):
+    response = client.get("/api/unknown")
+
+    assert response.status_code == 404
+    assert response.get_json()["error"]["code"] == "not_found"
+
+
+def test_invalid_method(client):
+    response = client.patch("/api/notes")
+
+    assert response.status_code == 405
+    assert response.get_json()["error"]["code"] == "method_not_allowed"
+
+
 def test_get_notes_empty(client):
     response = client.get("/api/notes")
 
@@ -89,7 +103,7 @@ def test_create_note_with_empty_title_returns_400(client):
     )
 
     assert response.status_code == 400
-    assert response.get_json()["error"] == "Invalid title"
+    assert response.get_json()["error"]["code"] == "invalid_title"
 
 
 def test_create_note_with_missing_field_returns_400(client):
@@ -102,7 +116,7 @@ def test_create_note_with_missing_field_returns_400(client):
     )
 
     assert response.status_code == 400
-    assert response.get_json()["error"] == "Invalid title"
+    assert response.get_json()["error"]["code"] == "invalid_body"
 
 
 def test_create_note_with_invalid_field_type_returns_400(client):
@@ -116,14 +130,36 @@ def test_create_note_with_invalid_field_type_returns_400(client):
     )
 
     assert response.status_code == 400
-    assert response.get_json()["error"] == "Invalid title"
+    assert response.get_json()["error"]["code"] == "invalid_title"
 
 
 def test_create_note_without_json_returns_400(client):
     response = client.post("/api/notes")
 
     assert response.status_code == 400
-    assert response.get_json()["error"] == "Invalid JSON"
+    assert response.get_json()["error"]["code"] == "invalid_json"
+
+
+def test_create_note_with_json_array_body_returns_400(client):
+    response = client.post("/api/notes", json=[1, 2, 3])
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_body"
+
+
+def test_create_note_with_extra_field_returns_400(client):
+    response = client.post(
+        "/api/notes",
+        json={
+            "title": "Test title",
+            "content": "Test content",
+            "category": "Test category",
+            "created_at": "2000-01-01",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_body"
 
 
 def test_update_note(app, client):
@@ -164,7 +200,7 @@ def test_update_note_not_found(client):
     )
 
     assert response.status_code == 404
-    assert response.get_json()["error"] == "Note not found"
+    assert response.get_json()["error"]["code"] == "note_not_found"
 
 
 def test_update_note_with_invalid_data_returns_400(client, app):
@@ -180,7 +216,7 @@ def test_update_note_with_invalid_data_returns_400(client, app):
     )
 
     assert response.status_code == 400
-    assert response.get_json()["error"] == "Invalid title"
+    assert response.get_json()["error"]["code"] == "invalid_title"
 
 
 def test_delete_note(app, client):
@@ -198,6 +234,13 @@ def test_delete_note_not_found(client):
     assert response.status_code == 404
 
 
+def test_get_notes_with_extra_query_param_returns_400(client):
+    response = client.get("/api/notes", query_string={"unknown": ""})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "unknown_query_parameter"
+
+
 def test_get_notes_filters_by_category(client, app):
     for _ in range(5):
         insert_note(app)
@@ -210,6 +253,35 @@ def test_get_notes_filters_by_category(client, app):
     assert response.status_code == 200
     assert len(data) == 1
     assert data[0]["category"] == "target"
+
+
+def test_get_notes_filters_with_empty_category_returns_400(client):
+    response = client.get("/api/notes", query_string={"category": ""})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_category_filter"
+
+
+def test_get_notes_filters_by_created_date(client):
+    response = client.get("/api/notes", query_string={"created_date": "2000-01-01"})
+    data = response.get_json()
+
+    assert response.status_code == 200
+    assert len(data) == 0
+
+
+def test_get_notes_filters_with_empty_created_date_returns_400(client):
+    response = client.get("/api/notes", query_string={"created_date": ""})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_created_date_filter"
+
+
+def test_get_notes_filters_with_invalid_created_date_returns_400(client):
+    response = client.get("/api/notes", query_string={"created_date": "2000-01-01x"})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_created_date_filter"
 
 
 def test_get_notes_searches_by_text(client, app):
@@ -229,6 +301,13 @@ def test_get_notes_searches_by_text(client, app):
         assert "target" in note["title"] or "target" in note["content"]
 
 
+def test_get_notes_with_empty_search_returns_400(client):
+    response = client.get("/api/notes", query_string={"search": ""})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_search"
+
+
 def test_get_notes_sorts_by_title_asc(client, app):
     for _ in range(5):
         insert_note(app)
@@ -239,3 +318,31 @@ def test_get_notes_sorts_by_title_asc(client, app):
 
     assert response.status_code == 200
     assert response.get_json()[0]["title"] == "A"
+
+
+def test_get_notes_with_empty_sort_returns_400(client):
+    response = client.get("/api/notes", query_string={"sort": ""})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_sort"
+
+
+def test_get_notes_with_invalid_sort_returns_400(client):
+    response = client.get("/api/notes", query_string={"sort": "error"})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_sort"
+
+
+def test_get_notes_with_empty_order_returns_400(client):
+    response = client.get("/api/notes", query_string={"order": ""})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_order"
+
+
+def test_get_notes_with_invalid_order_returns_400(client):
+    response = client.get("/api/notes", query_string={"order": "error"})
+
+    assert response.status_code == 400
+    assert response.get_json()["error"]["code"] == "invalid_order"
