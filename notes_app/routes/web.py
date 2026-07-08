@@ -12,22 +12,12 @@ web_bp = Blueprint("web", __name__)
 
 @web_bp.route("/notes-page", methods=["GET"])
 def get_notes_page():
-    category_filter = request.args.get("category")
-    created_date_filter = request.args.get("created_date")
-    search = request.args.get("search")
-    sort = request.args.get("sort")
-    order = request.args.get("order")
+    query_params = request.args.to_dict()
 
-    notes, error = get_notes_service(
-        category_filter=category_filter,
-        created_date_filter=created_date_filter,
-        search=search,
-        sort=sort,
-        order=order,
-    )
+    notes, error = get_notes_service(query_params)
 
     if error is not None:
-        return render_template("notes.html", notes=[], error=error), 400
+        return render_template("notes.html", notes=[], error=error["message"]), 400
 
     return render_template("notes.html", notes=notes, error=None), 200
 
@@ -44,7 +34,7 @@ def create_note_page():
 
     if error is not None:
         notes, _ = get_notes_service()
-        return render_template("notes.html", notes=notes, error=error), 400
+        return render_template("notes.html", notes=notes, error=error["message"]), 400
 
     return redirect(url_for("web.get_notes_page"))
 
@@ -59,13 +49,13 @@ def update_note_page(note_id):
 
     _, error = update_note_service(note_id, data)
 
-    if error == "Note not found":
+    if error is not None and error["message"] == "Note not found":
         notes, _ = get_notes_service()
-        return render_template("notes.html", notes=notes, error=error), 404
+        return render_template("notes.html", notes=notes, error=error["message"]), 404
 
     if error is not None:
         notes, _ = get_notes_service()
-        return render_template("notes.html", notes=notes, error=error), 400
+        return render_template("notes.html", notes=notes, error=error["message"]), 400
 
     return redirect(url_for("web.get_notes_page"))
 
@@ -76,6 +66,6 @@ def delete_note_page(note_id):
 
     if error is not None:
         notes, _ = get_notes_service()
-        return render_template("notes.html", notes=notes, error=error), 404
+        return render_template("notes.html", notes=notes, error=error["message"]), 404
 
     return redirect(url_for("web.get_notes_page"))
