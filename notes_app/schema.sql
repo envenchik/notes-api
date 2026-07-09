@@ -2,8 +2,8 @@ DROP TABLE IF EXISTS notes;
 
 CREATE TABLE IF NOT EXISTS notes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    category TEXT NOT NULL,
+    title TEXT NOT NULL CHECK(LENGTH(TRIM(title)) > 0),
+    content TEXT NOT NULL CHECK(LENGTH(TRIM(content)) > 0),
+    category TEXT NOT NULL CHECK(LENGTH(TRIM(category)) > 0),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
