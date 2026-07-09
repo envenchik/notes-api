@@ -1,3 +1,5 @@
+import sqlite3
+
 from pathlib import Path
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import HTTPException
@@ -30,7 +32,7 @@ def create_app(test_config=None) -> Flask:
     return app
 
 
-def register_error_handlers(app):
+def register_error_handlers(app: Flask):
     @app.errorhandler(HTTPException)
     def handle_http_exception(http_error):
         if request.path.startswith("/api/"):
@@ -44,3 +46,17 @@ def register_error_handlers(app):
             return jsonify(response), http_error.code
 
         return http_error
+
+    @app.errorhandler(sqlite3.Error)
+    def handle_db_exception(db_error):
+        if request.path.startswith("/api/"):
+            response = {
+                "error": {
+                    "code": "database_error",
+                    "message": "Database error",
+                }
+            }
+
+            return jsonify(response), 500
+
+        return "Internal Server Error", 500

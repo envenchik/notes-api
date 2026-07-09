@@ -1,3 +1,5 @@
+import sqlite3
+
 from notes_app.db import get_db
 
 
@@ -45,10 +47,9 @@ def get_notes_db(category_filter, created_date_filter, search, sort, order):
 
     query += f" ORDER BY {sort} {order.upper()}"
 
-    connection = get_db()
-    cursor = connection.cursor()
+    db = get_db()
 
-    cursor.execute(query, tuple(values))
+    cursor = db.execute(query, tuple(values))
 
     rows = cursor.fetchall()
 
@@ -58,10 +59,9 @@ def get_notes_db(category_filter, created_date_filter, search, sort, order):
 
 
 def get_note_by_id_db(note_id):
-    connection = get_db()
-    cursor = connection.cursor()
+    db = get_db()
 
-    cursor.execute("SELECT * FROM notes WHERE id = ?", (note_id,))
+    cursor = db.execute("SELECT * FROM notes WHERE id = ?", (note_id,))
 
     row = cursor.fetchone()
 
@@ -71,17 +71,19 @@ def get_note_by_id_db(note_id):
 
 
 def create_note_db(title, content, category):
-    connection = get_db()
-    cursor = connection.cursor()
+    db = get_db()
 
-    cursor.execute(
-        "INSERT INTO notes (title, content, category) VALUES (?, ?, ?)",
-        (title, content, category),
-    )
+    try:
+        cursor = db.execute(
+            "INSERT INTO notes (title, content, category) VALUES (?, ?, ?)",
+            (title, content, category),
+        )
 
-    new_note_id = cursor.lastrowid
-
-    connection.commit()
+        new_note_id = cursor.lastrowid
+        db.commit()
+    except sqlite3.Error:
+        db.rollback()
+        raise
 
     new_note = get_note_by_id_db(new_note_id)
 
@@ -89,18 +91,21 @@ def create_note_db(title, content, category):
 
 
 def update_note_db(note_id, title, content, category):
-    connection = get_db()
-    cursor = connection.cursor()
+    db = get_db()
 
-    cursor.execute(
-        "UPDATE notes SET title = ?, content = ?, category = ? WHERE id = ?",
-        (title, content, category, note_id),
-    )
+    try:
+        cursor = db.execute(
+            "UPDATE notes SET title = ?, content = ?, category = ? WHERE id = ?",
+            (title, content, category, note_id),
+        )
 
-    if cursor.rowcount == 0:
-        return None
+        if cursor.rowcount == 0:
+            return None
 
-    connection.commit()
+        db.commit()
+    except sqlite3.Error:
+        db.rollback()
+        raise
 
     updated_note = get_note_by_id_db(note_id)
 
@@ -108,14 +113,17 @@ def update_note_db(note_id, title, content, category):
 
 
 def delete_note_db(note_id):
-    connection = get_db()
-    cursor = connection.cursor()
+    db = get_db()
 
-    cursor.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+    try:
+        cursor = db.execute("DELETE FROM notes WHERE id = ?", (note_id,))
 
-    if cursor.rowcount == 0:
-        return False
+        if cursor.rowcount == 0:
+            return False
 
-    connection.commit()
+        db.commit()
+    except sqlite3.Error:
+        db.rollback()
+        raise
 
     return True

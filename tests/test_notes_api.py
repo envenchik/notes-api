@@ -5,12 +5,12 @@ def insert_note(
     app, title="Test title", content="Test content", category="Test category"
 ):
     with app.app_context():
-        connection = get_db()
-        cursor = connection.execute(
+        db = get_db()
+        cursor = db.execute(
             "INSERT INTO notes (title, content, category) VALUES (?, ?, ?)",
             (title, content, category),
         )
-        connection.commit()
+        db.commit()
         return cursor.lastrowid
 
 
