@@ -18,6 +18,7 @@ The goal of this project is to build a small backend application step by step an
 - Filtering notes by category and created date
 - Searching notes by title and content
 - Sorting notes by ID, title and creation date
+- Pagination with limit and offset
 - Basic HTML interface
 - Basic request validation
 - Routes, services and repositories layers
@@ -44,6 +45,8 @@ The goal of this project is to build a small backend application step by step an
 | `search` | `/api/notes?search=Example` | Search in title and content |
 | `sort` | `/api/notes?sort=title` | Sort by `id`, `title`, or `created_at` |
 | `order` | `/api/notes?order=asc` | Sort order: `asc` or `desc` |
+| `limit` | `/api/notes?limit=10` | Maximum number of notes to return; default `20`, allowed range `1–100` |
+| `offset` | `/api/notes?offset=20` | Number of notes to skip; default `0`, allowed range `0–1000000` |
 
 ## Errors
 
