@@ -9,14 +9,30 @@ from notes_app.repositories.note_repository import (
 )
 
 ALLOWED_DATA_FIELDS = {"title", "content", "category"}
-ALLOWED_QUERY_PARAMS = {"category", "created_date", "search", "sort", "order"}
+ALLOWED_QUERY_PARAMS = {
+    "category",
+    "created_date",
+    "search",
+    "sort",
+    "order",
+    "limit",
+    "offset",
+}
 ALLOWED_SORT_FIELDS = {"id", "title", "created_at"}
 ALLOWED_ORDERS = {"asc", "desc"}
 
 CREATED_DATE_PATTERN = r"\d{4}-\d{2}-\d{2}"
+LIMIT_AND_OFFSET_PATTERN = r"[0-9]+"
 
 DEFAULT_SORT = "created_at"
 DEFAULT_ORDER = "desc"
+DEFAULT_LIMIT = 20
+DEFAULT_OFFSET = 0
+
+MIN_LIMIT = 1
+MAX_LIMIT = 100
+MIN_OFFSET = 0
+MAX_OFFSET = 1000000
 
 
 def error_response(code, message):
@@ -71,6 +87,8 @@ def validate_query_params(query_params):
     search = query_params.get("search")
     sort = query_params.get("sort")
     order = query_params.get("order")
+    limit = query_params.get("limit")
+    offset = query_params.get("offset")
 
     for query_param in query_params.keys():
         if query_param not in ALLOWED_QUERY_PARAMS:
@@ -125,12 +143,54 @@ def validate_query_params(query_params):
     else:
         order = order.strip().lower()
 
+    if limit is None:
+        limit = DEFAULT_LIMIT
+    elif limit.strip() == "" or not re.fullmatch(
+        LIMIT_AND_OFFSET_PATTERN, limit.strip()
+    ):
+        return None, error_response(
+            "invalid_limit", "Limit must be an integer between 1 and 100"
+        )
+    else:
+        try:
+            limit = int(limit.strip())
+            if not MIN_LIMIT <= limit <= MAX_LIMIT:
+                return None, error_response(
+                    "invalid_limit", "Limit must be an integer between 1 and 100"
+                )
+        except ValueError:
+            return None, error_response(
+                "invalid_limit", "Limit must be an integer between 1 and 100"
+            )
+
+    if offset is None:
+        offset = DEFAULT_OFFSET
+    elif offset.strip() == "" or not re.fullmatch(
+        LIMIT_AND_OFFSET_PATTERN, offset.strip()
+    ):
+        return None, error_response(
+            "invalid_offset", "Offset must be an integer between 0 and 1000000"
+        )
+    else:
+        try:
+            offset = int(offset.strip())
+            if not MIN_OFFSET <= offset <= MAX_OFFSET:
+                return None, error_response(
+                    "invalid_offset", "Offset must be an integer between 0 and 1000000"
+                )
+        except ValueError:
+            return None, error_response(
+                "invalid_offset", "Offset must be an integer between 0 and 1000000"
+            )
+
     clean_query_params = {
         "category_filter": category_filter,
         "created_date_filter": created_date_filter,
         "search": search,
         "sort": sort,
         "order": order,
+        "limit": limit,
+        "offset": offset,
     }
 
     return clean_query_params, None
@@ -151,6 +211,8 @@ def get_notes_service(query_params=None):
         search=clean_query_params["search"],
         sort=clean_query_params["sort"],
         order=clean_query_params["order"],
+        limit=clean_query_params["limit"],
+        offset=clean_query_params["offset"],
     )
 
     return notes, None
