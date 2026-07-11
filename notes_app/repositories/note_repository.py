@@ -24,7 +24,9 @@ def rows_to_notes(rows):
     return notes
 
 
-def get_notes_db(category_filter, created_date_filter, search, sort, order):
+def get_notes_db(
+    category_filter, created_date_filter, search, sort, order, limit, offset
+):
     query = "SELECT * FROM notes"
     conditions = []
     values = []
@@ -45,7 +47,13 @@ def get_notes_db(category_filter, created_date_filter, search, sort, order):
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
-    query += f" ORDER BY {sort} {order.upper()}"
+    if sort == "id":
+        query += f" ORDER BY {sort} {order.upper()}"
+    else:
+        query += f" ORDER BY {sort} {order.upper()}, id {order.upper()}"
+
+    query += " LIMIT ? OFFSET ?"
+    values.extend([limit, offset])
 
     db = get_db()
 
