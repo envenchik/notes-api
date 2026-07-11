@@ -346,3 +346,78 @@ def test_get_notes_with_invalid_order_returns_400(client):
 
     assert response.status_code == 400
     assert response.get_json()["error"]["code"] == "invalid_order"
+
+
+def test_get_notes_limit(app, client):
+    for _ in range(10):
+        insert_note(app)
+
+    response = client.get("/api/notes", query_string={"limit": "5"})
+
+    assert response.status_code == 200
+    assert len(response.get_json()) == 5
+
+
+def test_get_notes_default_limit(app, client):
+    for _ in range(21):
+        insert_note(app)
+
+    response = client.get("/api/notes")
+
+    assert response.status_code == 200
+    assert len(response.get_json()) == 20
+
+
+def test_get_notes_limit_out_of_range(client):
+    response = client.get("/api/notes", query_string={"limit": "101"})
+
+    assert response.get_json()["error"]["code"] == "invalid_limit"
+    assert response.status_code == 400
+
+
+def test_get_notes_with_empty_limit(client):
+    response = client.get("/api/notes", query_string={"limit": ""})
+
+    assert response.get_json()["error"]["code"] == "invalid_limit"
+    assert response.status_code == 400
+
+
+def test_get_notes_offset(app, client):
+    for _ in range(2):
+        insert_note(app)
+
+    response = client.get("/api/notes", query_string={"offset": "1"})
+
+    assert response.status_code == 200
+    assert response.get_json()[0]["id"] == 1
+
+
+def test_get_notes_offset_out_of_range(client):
+    response = client.get("/api/notes", query_string={"offset": "10000001"})
+
+    assert response.get_json()["error"]["code"] == "invalid_offset"
+    assert response.status_code == 400
+
+
+def test_get_notes_with_empty_offset(client):
+    response = client.get("/api/notes", query_string={"offset": ""})
+
+    assert response.get_json()["error"]["code"] == "invalid_offset"
+    assert response.status_code == 400
+
+
+def test_get_notes_pagination(app, client):
+    for _ in range(6):
+        insert_note(app)
+
+    first_page = client.get(
+        "/api/notes",
+        query_string={"limit": "2", "offset": "0"},
+    )
+    second_page = client.get(
+        "/api/notes",
+        query_string={"limit": "2", "offset": "2"},
+    )
+
+    assert [note["id"] for note in first_page.get_json()] == [6, 5]
+    assert [note["id"] for note in second_page.get_json()] == [4, 3]
